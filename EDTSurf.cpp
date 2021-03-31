@@ -19,7 +19,7 @@ int main(int argc, char** argv)
 	char inname[200];
 	char tpname[200];
 	char filename[200];
-	bool flagopt[7];
+	bool flagopt[8];
 	bool bcolor;
 	int i;
 	clock_t remcstart, remcfinish;
@@ -38,7 +38,7 @@ int main(int argc, char** argv)
 		printf("output3: outname-cav.pdb\n");
 		return 0;
 	}
-	for(i=0;i<7;i++)
+	for(i=0;i<8;i++)
 	{
 		flagopt[i]=false;
 	}
@@ -154,7 +154,7 @@ int main(int argc, char** argv)
 			if(i+1<argc && !(argv[i+1][0]=='-' && (argv[i+1][1]=='o' || argv[i+1][1]=='t' || argv[i+1][1]=='s' || 
 				argv[i+1][1]=='c' || argv[i+1][1]=='p' || argv[i+1][1]=='f' || argv[i+1][1]=='h')))
 			{
-				flagopt[7]=true;
+			        flagopt[7]=true;
 				int tval=atoi(argv[i+1]);
 				if(tval==1) inum[3]=1;
 				else if(tval==2) inum[3]=2;

@@ -877,7 +877,7 @@ void ProteinSurface::checkinoutpropa()
 void ProteinSurface::outputply(char *filename,atom* proseq,int ncolor,int tinout)
 {//0 both 1 outer 2 inner
   
-  int i;
+  int i,va,vb,vc;
   unsigned char chaincolor[256];
   int tchain,indcolor2=1;
   for(i=0;i<256;i++)
@@ -891,7 +891,7 @@ void ProteinSurface::outputply(char *filename,atom* proseq,int ncolor,int tinout
       printf("wrong to output ply file %s\n",filename);
       return;
     }
-  std::cout << "proseq " << proseq << std::endl;
+  std::cout << "tinout " << tinout << "\n";
   int *vertind=new int[vertnumber];
   bool *flagface=new bool[facenumber];
   int realvertnum,realfacenum;
@@ -964,10 +964,12 @@ void ProteinSurface::outputply(char *filename,atom* proseq,int ncolor,int tinout
   fprintf(file,"property uchar red\n" );
   fprintf(file,"property uchar green\n" );
   fprintf(file,"property uchar blue\n" );
+  fprintf(file,"comment This file was tampered with by BW\n");
   fprintf(file,"end_header\n" );
   int tcolor[3];
   for(i=0;i<vertnumber;i++) if(vertind[i]!=-1)
-			      { 
+			      {
+				//BW va=verts[i].atomid;
 				if(ncolor==0)//pure
 				  {
 				    tcolor[0]=mycolor[13][0];
@@ -999,11 +1001,17 @@ void ProteinSurface::outputply(char *filename,atom* proseq,int ncolor,int tinout
 				    tcolor[1]=mycolor[chaincolor[proseq[verts[i].atomid].chainid]][1];
 				    tcolor[2]=mycolor[chaincolor[proseq[verts[i].atomid].chainid]][2];
 				  }
-				fprintf(file,"%.3f %.3f %.3f %3d %3d %3d\n", verts[i].x/scalefactor-ptran.x,verts[i].y/scalefactor-ptran.y,
-					verts[i].z/scalefactor-ptran.z,tcolor[0],tcolor[1],tcolor[2]);	
+				fprintf(file,"%.3f %.3f %.3f %3d %3d %3d # %c%c%c %d %c\n", verts[i].x/scalefactor-ptran.x,verts[i].y/scalefactor-ptran.y,
+					verts[i].z/scalefactor-ptran.z,tcolor[0],tcolor[1],tcolor[2],proseq[verts[i].atomid].residue[0],proseq[verts[i].atomid].residue[1],proseq[verts[i].atomid].residue[2],proseq[verts[i].atomid].resno,proseq[verts[i].atomid].chainid);
+				//BW fprintf(file,"# %c%c%c %d %c\n",proseq[va].residue[0],proseq[va].residue[1],proseq[va].residue[2],proseq[va].resno,proseq[va].chainid);
+				
 			      }
   for(i=0;i<facenumber;i++) if(flagface[i])
-			      { 
+			      {
+
+				va=verts[faces[i].a].atomid;
+				vb=verts[faces[i].b].atomid;
+				vc=verts[faces[i].c].atomid;
 				if(ncolor==0)//pure
 				  {
 				    tcolor[0]=mycolor[13][0];
@@ -1056,10 +1064,21 @@ void ProteinSurface::outputply(char *filename,atom* proseq,int ncolor,int tinout
 				    tcolor[1]=mycolor[tchain][1];
 				    tcolor[2]=mycolor[tchain][2];
 				  }
+				
 				if(!faces[i].inout)//outer
-				  fprintf(file,"3 %d %d %d %3d %3d %3d\n", vertind[faces[i].a],vertind[faces[i].b],vertind[faces[i].c],tcolor[0],tcolor[1],tcolor[2]);
-				else
+				  {
+				    fprintf(file,"3 %d %d %d %3d %3d %3d ", vertind[faces[i].a],vertind[faces[i].b],vertind[faces[i].c],tcolor[0],tcolor[1],tcolor[2]);
+				    fprintf(file,"# 1:%c%c%c %d %c ",proseq[va].residue[0],proseq[va].residue[1],proseq[va].residue[2],proseq[va].resno,proseq[va].chainid);
+				    fprintf(file,"# 2:%c%c%c %d %c ",proseq[vb].residue[0],proseq[vb].residue[1],proseq[vb].residue[2],proseq[vb].resno,proseq[vb].chainid);
+				    fprintf(file,"# 3:%c%c%c %d %c ",proseq[vc].residue[0],proseq[vc].residue[1],proseq[vc].residue[2],proseq[vc].resno,proseq[vc].chainid);
+				    fprintf(file,"\n");
+				  }else {
 				  fprintf(file,"3 %d %d %d %3d %3d %3d\n", vertind[faces[i].a],vertind[faces[i].c],vertind[faces[i].b],tcolor[0],tcolor[1],tcolor[2]);
+				  fprintf(file,"# 1:%c%c%c %d %c ",proseq[va].residue[0],proseq[va].residue[1],proseq[va].residue[2],proseq[va].resno,proseq[va].chainid);
+				  fprintf(file,"# 2:%c%c%c %d %c ",proseq[vb].residue[0],proseq[vb].residue[1],proseq[vb].residue[2],proseq[vb].resno,proseq[vb].chainid);
+				  fprintf(file,"# 3:%c%c%c %d %c ",proseq[vc].residue[0],proseq[vc].residue[1],proseq[vc].residue[2],proseq[vc].resno,proseq[vc].chainid);
+				  fprintf(file,"\n");
+				}
 			      }		
   fclose(file);
   delete[]vertind;
