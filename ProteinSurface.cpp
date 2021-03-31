@@ -964,7 +964,7 @@ void ProteinSurface::outputply(char *filename,atom* proseq,int ncolor,int tinout
   fprintf(file,"property uchar red\n" );
   fprintf(file,"property uchar green\n" );
   fprintf(file,"property uchar blue\n" );
-  fprintf(file,"comment This file was tampered with by BW\n");
+  fprintf(file,"comment This file was tampered with by BW, residue information added...\n");
   fprintf(file,"end_header\n" );
   int tcolor[3];
   for(i=0;i<vertnumber;i++) if(vertind[i]!=-1)
